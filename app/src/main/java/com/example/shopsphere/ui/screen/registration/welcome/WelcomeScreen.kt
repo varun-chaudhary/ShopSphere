@@ -146,7 +146,7 @@ fun WelcomeScreen(
                             navController.popBackStack()
                             navController.navigate(Screen.MainNav.route)
                             viewModel.saveLoginData(
-                                username = "Guest",
+                                username = "Varun",
                                 token = "Guest"
                             )
                         }

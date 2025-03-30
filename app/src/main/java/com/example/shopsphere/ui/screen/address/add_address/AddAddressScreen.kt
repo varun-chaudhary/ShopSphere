@@ -92,7 +92,7 @@ fun AddAddressScreen(
     val locationName by viewModel.locationName.observeAsState("")
     var hasZoomedManually by remember { mutableStateOf(false) }
 
-    var hasLocationPermissions by remember { mutableStateOf(false) }
+
 
     LaunchedEffect(uiState) {
         if (uiState is UiState.Success && !hasZoomedManually) {
@@ -103,9 +103,6 @@ fun AddAddressScreen(
         }
     }
 
-    RequestLocationPermission {
-        hasLocationPermissions = true
-    }
 
     LaunchedEffect(Unit) {
         scaffoldState.bottomSheetState.expand()
@@ -151,33 +148,7 @@ fun AddAddressScreen(
                         .padding(8.dp)
                         .clickable { navController.navigateUp() }
                 )
-
-                Icon(
-                    imageVector = Icons.Default.MyLocation,
-                    contentDescription = "Get Your Location",
-                    modifier = Modifier
-                        .align(Alignment.TopEnd)
-                        .size(40.dp)
-                        .background(
-                            Color.White,
-                            shape = RoundedCornerShape(50)
-                        )
-                        .padding(8.dp)
-                        .clickable {
-                            if (hasLocationPermissions) {
-                                hasZoomedManually = false
-                                viewModel.getCurrentLocation()
-                            } else {
-                                Toast
-                                    .makeText(
-                                        context,
-                                        "Location permission denied",
-                                        Toast.LENGTH_SHORT
-                                    )
-                                    .show()
-                            }
-                        }
-                )
+                
             }
         },
         scaffoldState = scaffoldState,
@@ -474,33 +445,6 @@ fun BottomSheetContent(
     }
 }
 
-@Composable
-fun RequestLocationPermission(onPermissionGranted: () -> Unit) {
-    val context = LocalContext.current
-    val permissionLauncher = rememberLauncherForActivityResult(
-        contract = ActivityResultContracts.RequestMultiplePermissions(),
-        onResult = { permissions ->
-            val fineLocationGranted = permissions[Manifest.permission.ACCESS_FINE_LOCATION] ?: false
-            val coarseLocationGranted = permissions[Manifest.permission.ACCESS_COARSE_LOCATION] ?: false
-
-            if (fineLocationGranted || coarseLocationGranted) {
-                onPermissionGranted()
-            } else {
-                Toast.makeText(context, "Location permission denied", Toast.LENGTH_SHORT).show()
-            }
-        }
-    )
-
-    LaunchedEffect(Unit) {
-        permissionLauncher.launch(
-            arrayOf(
-                Manifest.permission.ACCESS_FINE_LOCATION,
-                Manifest.permission.ACCESS_COARSE_LOCATION
-            )
-        )
-    }
-
-}
 
 @Preview(showBackground = true)
 @Composable

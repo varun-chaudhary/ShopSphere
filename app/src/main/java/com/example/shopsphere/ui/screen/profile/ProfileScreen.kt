@@ -138,14 +138,14 @@ fun ProfileScreen(
                     ) {
                         Text(
                             letterSpacing = 0.001.sp,
-                            text = username.toString(),
+                            text = "Varun",
                             fontFamily = poppinsFontFamily,
                             fontWeight = FontWeight.SemiBold,
                             fontSize = 20.sp,
 
                             )
                         Text(
-                            text = "$ 2.341.000",
+                            text = "Rs. 99,999",
                             fontFamily = poppinsFontFamily,
                             fontSize = 16.sp,
                             fontWeight = FontWeight.Medium,
