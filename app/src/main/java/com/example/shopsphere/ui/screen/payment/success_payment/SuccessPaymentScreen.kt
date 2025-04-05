@@ -85,7 +85,7 @@ fun SuccessPaymentScreen(
             ) {
                 Text(
                     fontFamily = poppinsFontFamily,
-                    text = "$${"%.2f".format(latestCheckout?.totalPrice)}",
+                    text = "Rs. ${"%.2f".format(latestCheckout?.totalPrice)}",
                     fontSize = 30.sp,
                     fontWeight = FontWeight.SemiBold,
                     modifier = Modifier.weight(1f)

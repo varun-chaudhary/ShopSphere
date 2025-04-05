@@ -146,7 +146,7 @@ fun OrderItem(
                     modifier = Modifier
                 )
                 Text(
-                    text = "$${"%.2f".format(totalPrice)}",
+                    text = "Rs. ${"%.2f".format(totalPrice)}",
                     fontSize = 14.sp,
                     fontWeight = FontWeight.SemiBold,
                     fontFamily = poppinsFontFamily,

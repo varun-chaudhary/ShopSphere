@@ -119,7 +119,7 @@ fun CartItem(
             )
             Spacer(modifier = Modifier.padding(top = 8.dp))
             Text(
-                text = "$${"%.2f".format(totalPrice)}",
+                text = "Rs. ${"%.2f".format(totalPrice)}",
                 fontFamily = poppinsFontFamily,
                 fontWeight = FontWeight.Medium
             )
@@ -202,7 +202,7 @@ fun CartItemDummy(
             )
             Spacer(modifier = Modifier.padding(top = 8.dp))
             Text(
-                text = "$${"%.2f".format(totalPrice)}",
+                text = "Rs. ${"%.2f".format(totalPrice)}",
                 fontFamily = poppinsFontFamily,
                 fontWeight = FontWeight.Medium
             )
@@ -326,7 +326,7 @@ fun CartItemMini(
             Spacer(modifier = Modifier.padding(top = 8.dp))
             Row {
                 Text(
-                    text = "$orderCount x $${"%.2f".format(totalPrice)}",
+                    text = "$orderCount x RS. ${"%.2f".format(totalPrice)}",
                     fontFamily = poppinsFontFamily,
                     fontWeight = FontWeight.Medium,
                     modifier = Modifier.weight(1f)

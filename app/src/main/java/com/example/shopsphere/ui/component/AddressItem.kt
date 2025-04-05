@@ -121,10 +121,10 @@ private fun AddressItemPreview() {
         dynamicColor = false
     ) {
         AddressItemScreen(
-            name = "Dwi Azi Prasetya",
-            address = "Jl. Durian No. 123, Banyubiru " +
-                    "Kab. Semarang, Jawa Tengah " +
-                    "Indonesia, 50123",
+            name = "Varun",
+            address = "Paras Estate 281 " +
+                    "Leather Complex Road " +
+                    "Jalandhar, 144021",
         )
     }
 }
@@ -205,10 +205,10 @@ private fun AddressItemPreview2() {
         dynamicColor = false
     ) {
         AddressItemScreen2(
-            name = "Dwi Azi Prasetya",
-            address = "Jl. Durian No. 123, Banyubiru " +
-                    "Kab. Semarang, Jawa Tengah " +
-                    "Indonesia, 50123",
+            name = "Varun",
+            address = "281 Paras Estate " +
+                    "Leather Complex Road" +
+                    "Jalandhar, 144021",
             isSelected = true,
             onDeleteClick = {},
             onChooseClick = {}

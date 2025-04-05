@@ -75,7 +75,7 @@ fun FavouriteItem(
             )
             Spacer(modifier = Modifier.padding(top = 8.dp))
             Text(
-                text = "$$price",
+                text = "Rs. $price",
                 fontFamily = poppinsFontFamily,
                 fontWeight = FontWeight.Medium
             )

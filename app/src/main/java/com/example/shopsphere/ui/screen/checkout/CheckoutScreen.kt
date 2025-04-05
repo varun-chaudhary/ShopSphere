@@ -435,7 +435,7 @@ fun CheckoutContent(
                     )
                     Text(
                         fontFamily = poppinsFontFamily,
-                        text = "$${"%.2f".format(state?.totalPrice)}",
+                        text = "Rs. ${"%.2f".format(state?.totalPrice)}",
                         fontWeight = FontWeight.SemiBold,
                         color = MaterialTheme.colorScheme.primary
                     )
@@ -453,14 +453,14 @@ fun CheckoutContent(
                     selectedShippingId?.let {
                         Text(
                             fontFamily = poppinsFontFamily,
-                            text = "$${shippingItem[selectedShippingId].price}",
+                            text = "Rs. ${shippingItem[selectedShippingId].price}",
                             fontWeight = FontWeight.SemiBold,
                             color = MaterialTheme.colorScheme.primary
                         )
                     } ?: run {
                         Text(
                             fontFamily = poppinsFontFamily,
-                            text = "$0.00",
+                            text = "Rs. 0.00",
                             fontWeight = FontWeight.SemiBold,
                             color = MaterialTheme.colorScheme.primary
                         )
@@ -481,8 +481,8 @@ fun CheckoutContent(
                     ) {
                         if (selectedCouponId != null) {
                             Text(
-                                text = if (selectedShippingId == null) "$${"%.2f".format(state?.totalPrice)}"
-                                else "$${"%.2f".format(
+                                text = if (selectedShippingId == null) "Rs. ${"%.2f".format(state?.totalPrice)}"
+                                else "Rs. ${"%.2f".format(
                                     (state?.totalPrice)?.plus(shippingItem[selectedShippingId].price)
                                 )}",
                                 fontFamily = poppinsFontFamily,
@@ -493,7 +493,7 @@ fun CheckoutContent(
                         Spacer(modifier = Modifier.width(8.dp))
                         Text(
                             fontFamily = poppinsFontFamily,
-                            text = "$${"%.2f".format(finalPrice)}",
+                            text = "Rs. ${"%.2f".format(finalPrice)}",
                             fontWeight = FontWeight.SemiBold,
                             color = MaterialTheme.colorScheme.primary
                         )

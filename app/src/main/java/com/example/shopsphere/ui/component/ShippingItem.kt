@@ -47,7 +47,7 @@ fun ShippingItem(
                 modifier = Modifier.weight(1f)
             ) {
                 Text(
-                    text = "$name ($$price)",
+                    text = "$name (Rs. $price)",
                     fontSize = 14.sp,
                     fontFamily = poppinsFontFamily,
                     fontWeight = FontWeight.SemiBold,

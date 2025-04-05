@@ -279,7 +279,7 @@ fun MyCartContent(
                         fontFamily = poppinsFontFamily,
                         fontWeight = FontWeight.SemiBold,
                         fontSize = 18.sp,
-                        text = "\$${"%.2f".format(totalPrice)}"
+                        text = "Rs. ${"%.2f".format(totalPrice)}"
                     )
                 }
                 Spacer(modifier = Modifier.size(16.dp))

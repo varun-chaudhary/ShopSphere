@@ -141,7 +141,7 @@ fun ProductCard2(
                     modifier = Modifier
                         .offset(y = (5).dp)
                         .weight(1f),
-                    text = "$$price",
+                    text = "Rs. $price",
                     fontWeight = FontWeight.SemiBold,
                     fontSize = 20.sp,
                     fontFamily = poppinsFontFamily,

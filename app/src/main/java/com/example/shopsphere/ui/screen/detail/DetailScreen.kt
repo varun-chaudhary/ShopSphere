@@ -310,7 +310,7 @@ fun DetailContent(
                     fontFamily = poppinsFontFamily,
                     fontWeight = FontWeight.SemiBold,
                     fontSize = 40.sp,
-                    text = "$${product.price}"
+                    text = "Rs. ${product.price}"
                 )
                 Button(
                     modifier = Modifier

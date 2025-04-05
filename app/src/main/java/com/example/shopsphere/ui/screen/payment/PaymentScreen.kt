@@ -224,7 +224,7 @@ fun PaymentContent(
                     )
                     Text(
                         fontFamily = poppinsFontFamily,
-                        text = "$${"%.2f".format(latestCheckout?.totalPrice)}",
+                        text = "Rs. ${"%.2f".format(latestCheckout?.totalPrice)}",
                         fontWeight = FontWeight.SemiBold,
                         color = MaterialTheme.colorScheme.primary
                     )
