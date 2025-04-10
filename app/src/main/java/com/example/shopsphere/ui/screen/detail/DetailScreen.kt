@@ -1,5 +1,5 @@
 package com.example.shopsphere.ui.screen.detail
-
+import android.util.Log
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Box
@@ -31,6 +31,7 @@ import androidx.compose.material3.Scaffold
 import androidx.compose.material3.SnackbarHost
 import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.Text
+import androidx.compose.material3.TextButton
 import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
@@ -286,6 +287,28 @@ fun DetailContent(
                 text = product.description,
                 fontSize = (14).sp
             )
+            Button(
+                modifier = Modifier
+                    .height(55.dp)
+                    .width(120.dp),
+                shape = RoundedCornerShape(10.dp),
+                onClick = addCart,
+                colors = ButtonDefaults.buttonColors(
+                    containerColor = MaterialTheme.colorScheme.primary
+                )
+            ) {
+                Row(
+                    verticalAlignment = Alignment.CenterVertically
+                ) {
+                    Text(
+                        fontFamily = poppinsFontFamily,
+                        text = "Compare Vendors",
+                        color = Color.White,
+                        fontSize = 14.sp,
+                        modifier = Modifier.padding(2.dp)
+                    )
+                }
+            }
         }
         Box(
             modifier = Modifier
