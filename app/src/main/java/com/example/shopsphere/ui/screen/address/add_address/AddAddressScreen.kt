@@ -10,6 +10,7 @@ import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
@@ -32,6 +33,7 @@ import androidx.compose.material.rememberBottomSheetScaffoldState
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.OutlinedTextField
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
@@ -80,367 +82,49 @@ fun AddAddressScreen(
     ),
     navController: NavController
 ) {
-    val initialPosition = LatLng(-7.051663448625907, 110.44415489433972)
-    val cameraPositionState = rememberCameraPositionState {
-        position = CameraPosition.fromLatLngZoom(initialPosition, 17f)
-    }
-
     var name by remember { mutableStateOf("") }
-    val scaffoldState = rememberBottomSheetScaffoldState()
-    val context = LocalContext.current
-    val uiState by viewModel.uiState.observeAsState(UiState.Loading)
-    val locationName by viewModel.locationName.observeAsState("")
-    var hasZoomedManually by remember { mutableStateOf(false) }
+    var address by remember { mutableStateOf("") }
 
-
-
-    LaunchedEffect(uiState) {
-        if (uiState is UiState.Success && !hasZoomedManually) {
-            val location = (uiState as UiState.Success<LatLng>).data
-            cameraPositionState.animate(
-                update = CameraUpdateFactory.newLatLngZoom(location, 17f)
-            )
-        }
-    }
-
-
-    LaunchedEffect(Unit) {
-        scaffoldState.bottomSheetState.expand()
-    }
-
-    LaunchedEffect(cameraPositionState.isMoving) {
-        if (!cameraPositionState.isMoving) {
-            val currentLatLng = cameraPositionState.position.target
-            viewModel.getInitialLocationName(currentLatLng)
-        } else {
-            hasZoomedManually = true
-        }
-    }
-
-    BottomSheetScaffold(
-        sheetShape = RoundedCornerShape(
-            topStart = 20.dp,
-            topEnd = 20.dp
-        ),
-        sheetPeekHeight = 0.dp,
-        floatingActionButtonPosition = FabPosition.Center,
-        floatingActionButton = {
-            Box(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(
-                        top = 16.dp,
-                        start = 16.dp,
-                        end = 16.dp,
-                        bottom = 8.dp
-                    )
-            ) {
-                Icon(
-                    imageVector = Icons.AutoMirrored.Filled.ArrowBack,
-                    contentDescription = "Back",
-                    modifier = Modifier
-                        .align(Alignment.TopStart)
-                        .size(40.dp)
-                        .background(
-                            Color.White,
-                            shape = RoundedCornerShape(50)
-                        )
-                        .padding(8.dp)
-                        .clickable { navController.navigateUp() }
-                )
-                
-            }
-        },
-        scaffoldState = scaffoldState,
-        sheetContent = {
-            BottomSheetContent(
-                locationName = locationName,
-                uiState = uiState,
-                viewModel = viewModel,
-                onRecipientNameChange = { name = it },
-                cameraPositionState = cameraPositionState,
-                recipientName = name,
-                onConfirm = {
-                    viewModel.addUsersLocation(
-                        name,
-                        locationName,
-                    )
-                    DialogHelper.showDialogSuccess(
-                        context = context,
-                        title = "Success",
-                        textContent = "Location added",
-                        textConfirm = "OK",
-                        onConfirm = {
-                            navController.navigate(Screen.Address.route){
-                                popUpTo(Screen.Address.route) { inclusive = true }
-                            }
-                        }
-                    )
-                }
-            )
-        },
-        modifier = Modifier.navigationBarsPadding(),
-        sheetGesturesEnabled = true,
-    ) {
-        Box(
-            modifier = Modifier.fillMaxSize()
-        ) {
-            GoogleMapContent(
-                cameraPositionState = cameraPositionState,
-            )
-        }
-    }
-}
-
-@Composable
-fun GoogleMapContent(
-    cameraPositionState: CameraPositionState,
-) {
-    Box(modifier = Modifier
-        .fillMaxSize()) {
-        GoogleMap(
-            modifier = Modifier.matchParentSize(),
-            cameraPositionState = cameraPositionState,
-        )
-        Box(
-            contentAlignment = Alignment.Center,
-            modifier = Modifier.align(Alignment.Center)
-        ) {
-            Box(
-                contentAlignment = Alignment.Center,
-                modifier = Modifier
-                    .size(40.dp)
-                    .background(
-                        color = Color.White,
-                        shape = CircleShape
-                    )
-            ) {
-                Icon(
-                    painter = painterResource(id = R.drawable.icon_circle_dot_filled),
-                    contentDescription = "Custom Pin",
-                    modifier = Modifier
-                        .size(40.dp),
-                    tint = Color("#FF9100".toColorInt())
-                )
-            }
-
-            Box(
-                modifier = Modifier
-                    .size(10.dp)
-                    .align(Alignment.BottomCenter)
-                    .offset(y = 15.dp)
-                    .background(
-                        color = Color("#FF9100".toColorInt()),
-                        shape = CircleShape
-                    )
-            )
-        }
-    }
-}
-
-@Composable
-fun BottomSheetContent(
-    locationName: String,
-    uiState: UiState<LatLng>,
-    viewModel: AddAddressViewModel,
-    cameraPositionState: CameraPositionState,
-    recipientName: String,
-    onRecipientNameChange: (String) -> Unit,
-    onConfirm: () -> Unit
-) {
     Column(
         modifier = Modifier
-            .height(265.dp)
-            .fillMaxWidth()
-            .padding(
-                top = 16.dp,
-                start = 16.dp,
-                end = 16.dp,
-                bottom = 8.dp
-            )
+            .fillMaxSize()
+            .padding(16.dp)
     ) {
-        when (uiState) {
-            is UiState.Loading -> {
-                Text(
-                    text = "Recipient Name",
-                    fontFamily = poppinsFontFamily,
-                    fontWeight = FontWeight.SemiBold,
-                    modifier = Modifier.padding(bottom = 8.dp)
-                )
-                BasicTextField(
-                    value = recipientName,
-                    onValueChange = onRecipientNameChange,
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .padding(bottom = 16.dp)
-                        .drawBehind {
-                            val strokeWidth = 2.dp.toPx()
-                            val y = size.height - strokeWidth / 2
-                            drawLine(
-                                color = Color(0xFFCAC8C8),
-                                start = Offset(0f, y),
-                                end = Offset(size.width, y),
-                                strokeWidth = strokeWidth
-                            )
-                        },
-                    textStyle = TextStyle(
-                        fontFamily = poppinsFontFamily,
-                        fontWeight = FontWeight.Normal,
-                        color = Color.Black,
-                    ),
-                    singleLine = true,
-                    decorationBox = { innerTextField ->
-                        Box(
-                            modifier = Modifier
-                                .padding(vertical = 4.dp)
-                        ) {
-                            if (recipientName.isEmpty()) {
-                                Text(
-                                    text = "Enter recipient's name",
-                                    style = TextStyle(
-                                        fontFamily = poppinsFontFamily,
-                                        fontWeight = FontWeight.Normal,
-                                        color = Color.Gray
-                                    )
-                                )
-                            }
-                            innerTextField()
-                        }
-                    }
-                )
-                Text(
-                    text = "Detail Address",
-                    fontFamily = poppinsFontFamily,
-                    fontWeight = FontWeight.SemiBold,
-                    modifier = Modifier.padding(bottom = 8.dp)
-                )
-                Row {
-                    Icon(
-                        painter = painterResource(R.drawable.icon_circle_dot_filled),
-                        contentDescription = "",
-                        tint = Color("#FF9100".toColorInt()),
-                        modifier = Modifier.padding(end = 16.dp)
-                    )
-                    Box(modifier = Modifier.fillMaxSize()){
-                        AnimatedShimmerDetailAddress()
+        Text(
+            text = "Add Address",
+            style = MaterialTheme.typography.headlineMedium,
+            modifier = Modifier.padding(bottom = 16.dp)
+        )
 
-                        val currentLatLng = cameraPositionState.position.target
-                        viewModel.getInitialLocationName(currentLatLng)
-                    }
-                }
-                Button(
-                    modifier = Modifier
-                        .padding(top = 16.dp)
-                        .height(55.dp)
-                        .fillMaxWidth(),
-                    shape = RoundedCornerShape(10.dp),
-                    onClick = onConfirm,
-                    colors = ButtonDefaults.buttonColors(
-                        containerColor = MaterialTheme.colorScheme.primary
-                    )
-                ) {
-                    androidx.compose.material3.Text(
-                        fontFamily = poppinsFontFamily,
-                        text = "Confirmation",
-                        fontSize = 14.sp,
-                        color = Color.White
-                    )
-                }
-            } is UiState.Success -> {
-                Text(
-                    text = "Recipient Name",
-                    fontFamily = poppinsFontFamily,
-                    fontWeight = FontWeight.Medium,
-                    modifier = Modifier.padding(bottom = 8.dp)
-                )
-                BasicTextField(
-                    value = recipientName,
-                    onValueChange = onRecipientNameChange,
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .padding(bottom = 16.dp)
-                        .drawBehind {
-                            val strokeWidth = 2.dp.toPx()
-                            val y = size.height - strokeWidth / 2
-                            drawLine(
-                                color = Color(0xFFCAC8C8),
-                                start = Offset(0f, y),
-                                end = Offset(size.width, y),
-                                strokeWidth = strokeWidth
-                            )
-                        },
-                    textStyle = TextStyle(
-                        fontFamily = poppinsFontFamily,
-                        fontWeight = FontWeight.Normal,
-                        color = Color.Black,
-                    ),
-                    singleLine = true,
-                    decorationBox = { innerTextField ->
-                        Box(
-                            modifier = Modifier
-                                .padding(vertical = 4.dp)
-                        ) {
-                            if (recipientName.isEmpty()) {
-                                Text(
-                                    text = "Enter recipient's name",
-                                    style = TextStyle(
-                                        fontFamily = poppinsFontFamily,
-                                        fontWeight = FontWeight.Normal,
-                                        color = Color.Gray
-                                    )
-                                )
-                            }
-                            innerTextField()
-                        }
-                    }
-                )
-                Text(
-                    text = "Detail Address",
-                    fontFamily = poppinsFontFamily,
-                    fontWeight = FontWeight.Medium,
-                    modifier = Modifier.padding(bottom = 8.dp)
-                )
-                Row {
-                    Icon(
-                        painter = painterResource(R.drawable.icon_circle_dot_filled),
-                        contentDescription = "",
-                        tint = Color("#FF9100".toColorInt()),
-                        modifier = Modifier.padding(end = 16.dp)
-                    )
-                    Text(
-                        modifier = Modifier.height(60.dp),
-                        text = locationName,
-                        maxLines = 3,
-                        fontFamily = poppinsFontFamily,
-                        fontWeight = FontWeight.Normal,
-                    )
-                }
-                Button(
-                    modifier = Modifier
-                        .padding(top = 16.dp)
-                        .height(55.dp)
-                        .fillMaxWidth(),
-                    shape = RoundedCornerShape(10.dp),
-                    onClick = onConfirm,
-                    colors = ButtonDefaults.buttonColors(
-                        containerColor = MaterialTheme.colorScheme.primary
-                    )
-                ) {
-                    androidx.compose.material3.Text(
-                        fontFamily = poppinsFontFamily,
-                        text = "Confirmation",
-                        fontSize = 14.sp,
-                        color = Color.White
-                    )
-                }
-            }
-            is UiState.Error -> {
-                Text(
-                    text = "Error: ${uiState.errorMessage}",
-                    fontFamily = poppinsFontFamily,
-                    fontWeight = FontWeight.Bold
-                )
-            }
+        OutlinedTextField(
+            value = name,
+            onValueChange = { name = it },
+            label = { Text("Name") },
+            modifier = Modifier.fillMaxWidth()
+        )
+
+        Spacer(modifier = Modifier.height(12.dp))
+
+        OutlinedTextField(
+            value = address,
+            onValueChange = { address = it },
+            label = { Text("Address") },
+            modifier = Modifier
+                .fillMaxWidth()
+                .height(150.dp),
+            maxLines = 5
+        )
+
+        Spacer(modifier = Modifier.height(24.dp))
+
+        Button(
+            onClick = {
+                viewModel.addUsersLocation(name, address)
+                navController.popBackStack()
+            },
+            modifier = Modifier.fillMaxWidth()
+        ) {
+            Text("Save Address")
         }
     }
 }
@@ -450,8 +134,6 @@ fun BottomSheetContent(
 @Composable
 private fun AddAddressScreenPreview() {
     ShopSphereTheme {
-        GoogleMapContent(
-            cameraPositionState = rememberCameraPositionState()
-        )
+
     }
 }
