@@ -37,8 +37,10 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.runtime.mutableFloatStateOf
+import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -56,6 +58,7 @@ import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavHostController
 import coil.compose.AsyncImage
 import com.example.shopsphere.R
+import com.example.shopsphere.data.multivendor.Vendor
 import com.example.shopsphere.helper.DialogHelper
 import com.example.shopsphere.helper.ViewModelFactory
 import com.example.shopsphere.model.ProductResponseItem
@@ -85,6 +88,10 @@ fun DetailScreen(
     val uiState by viewModel.uiState.observeAsState(initial = UiState.Loading)
     val favouriteItems by viewModel.favouriteItems.observeAsState(emptyList())
     val isProductFavorited by viewModel.isProductFavorited(productId).observeAsState(false)
+
+    var showDialog by remember { mutableStateOf(false) }
+    var selectedPrice by remember { mutableStateOf(productId.toDouble()) }
+
 
     Scaffold(
         snackbarHost = {
@@ -157,6 +164,7 @@ fun DetailScreen(
             }
             is UiState.Success -> {
                 val data = (uiState as UiState.Success<ProductResponseItem>).data
+                selectedPrice =data.price as Double
                 DetailContent(
                     product = data,
                     paddingValues = innerPading,
@@ -173,7 +181,9 @@ fun DetailScreen(
                             }
                         )
                     },
-                    rating = data.rating.rate.toString()
+                    rating = data.rating.rate.toString(),
+                    onCompareClick = { showDialog = true },
+                    selectedPrice = selectedPrice
                 )
             }
             is UiState.Error -> {
@@ -183,6 +193,18 @@ fun DetailScreen(
             }
         }
     }
+    // Show dialog for vendor comparison
+    if (showDialog) {
+        CompareVendorsDialog(
+            originalPrice = selectedPrice,
+            onDismiss = { showDialog = false },
+            onVendorSelected = { price ->
+                selectedPrice = price
+                Log.d("hehe DetailScreen", "Selected price: $selectedPrice")
+                showDialog = false
+            }
+        )
+    }
 }
 
 @Composable
@@ -191,6 +213,8 @@ fun DetailContent(
     addCart: () -> Unit,
     rating: String,
     paddingValues: PaddingValues,
+    onCompareClick: () -> Unit,
+    selectedPrice: Double? = null
 ) {
     val ratingState by remember { mutableFloatStateOf(rating.toFloat()) }
 
@@ -292,7 +316,7 @@ fun DetailContent(
                     .height(55.dp)
                     .width(120.dp),
                 shape = RoundedCornerShape(10.dp),
-                onClick = addCart,
+                onClick = onCompareClick,
                 colors = ButtonDefaults.buttonColors(
                     containerColor = MaterialTheme.colorScheme.primary
                 )
@@ -333,7 +357,7 @@ fun DetailContent(
                     fontFamily = poppinsFontFamily,
                     fontWeight = FontWeight.SemiBold,
                     fontSize = 40.sp,
-                    text = "Rs. ${product.price}"
+                    text = "Rs. ${String.format("%.1f", selectedPrice ?: product.price)}"
                 )
                 Button(
                     modifier = Modifier
@@ -416,7 +440,53 @@ private fun DetailScreenPreview() {
             ),
             addCart = {  },
             rating = "3.9",
-            paddingValues = PaddingValues()
+            paddingValues = PaddingValues(),
+            onCompareClick = {}
         )
     }
+}
+
+
+@Composable
+fun CompareVendorsDialog(
+    originalPrice: Double,
+    onDismiss: () -> Unit,
+    onVendorSelected: (Double) -> Unit
+) {
+    val vendors = remember { generateRandomVendors(originalPrice) }
+
+    androidx.compose.material3.AlertDialog(
+        onDismissRequest = onDismiss,
+        title = { Text("Compare Vendors") },
+        text = {
+            Column {
+                vendors.forEach { vendor ->
+                    Row(modifier = Modifier.clickable {
+                        onVendorSelected(vendor.price)
+                        onDismiss()
+                    }) {
+                        Text(text = "${vendor.name}: Rs. ${vendor.price}")
+                        Spacer(modifier = Modifier.width(8.dp))
+                        Text(text = "Rating: ${vendor.rating}")
+                    }
+                    Spacer(modifier = Modifier.height(8.dp))
+                }
+            }
+        },
+        confirmButton = {
+            TextButton(onClick = onDismiss) {
+                Text("Close")
+            }
+        }
+    )
+}
+
+
+fun generateRandomVendors(originalPrice: Double): List<Vendor> {
+    val op = String.format("%.1f", originalPrice ).toDouble()
+    return listOf(
+        Vendor("Amazon", op+2, 4.2),
+        Vendor("Flipkart", op+5 , 3.9),
+        Vendor("Meesho", op, 3.7)
+    )
 }

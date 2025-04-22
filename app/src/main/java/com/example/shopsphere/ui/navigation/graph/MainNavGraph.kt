@@ -18,6 +18,7 @@ import com.example.shopsphere.ui.screen.address.AddressScreen
 import com.example.shopsphere.ui.screen.address.add_address.AddAddressScreen
 import com.example.shopsphere.ui.screen.categories.CategoriesScreen
 import com.example.shopsphere.ui.screen.checkout.CheckoutScreen
+import com.example.shopsphere.ui.screen.comparison.CompareVendorsScreen
 import com.example.shopsphere.ui.screen.coupon.CouponScreen
 import com.example.shopsphere.ui.screen.detail.DetailScreen
 import com.example.shopsphere.ui.screen.favourite.FavouriteScreen
@@ -160,6 +161,38 @@ fun MainNavGraph(
         ) {
             YourOrderScreen(navController = navController)
         }
+        composable(
+            route = Screen.CompareVendors.route,
+            arguments = listOf(navArgument("productId") { type = NavType.IntType }),
+            enterTransition = {
+                slideIntoContainer(
+                    AnimatedContentTransitionScope.SlideDirection.Left,
+                    tween(500)
+                )
+            },
+            exitTransition = {
+                slideOutOfContainer(
+                    AnimatedContentTransitionScope.SlideDirection.Right,
+                    tween(500)
+                )
+            },
+            popEnterTransition = {
+                slideIntoContainer(
+                    AnimatedContentTransitionScope.SlideDirection.Right,
+                    tween(500)
+                )
+            },
+            popExitTransition = {
+                slideOutOfContainer(
+                    AnimatedContentTransitionScope.SlideDirection.Left,
+                    tween(500)
+                )
+            }
+        ) { backStackEntry ->
+            val productId = backStackEntry.arguments?.getInt("productId") ?: -1
+            CompareVendorsScreen(productId = productId, navController = navController)
+        }
+
         composable(
             route = Screen.SuccessPayment.route,
             enterTransition = {
