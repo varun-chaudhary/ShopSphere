@@ -2,6 +2,7 @@ package com.example.shopsphere.ui.screen.detail
 import android.util.Log
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
@@ -20,6 +21,7 @@ import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.filled.Star
+import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.CenterAlignedTopAppBar
@@ -34,6 +36,7 @@ import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.runtime.mutableFloatStateOf
@@ -82,6 +85,7 @@ fun DetailScreen(
         )
     )
 ) {
+
     val snackbarHostState = remember { SnackbarHostState() }
     val scope = rememberCoroutineScope()
     val context = LocalContext.current
@@ -91,6 +95,7 @@ fun DetailScreen(
 
     var showDialog by remember { mutableStateOf(false) }
     var selectedPrice by remember { mutableStateOf(productId.toDouble()) }
+    var opPrice by remember { mutableStateOf(productId.toDouble()) }
 
 
     Scaffold(
@@ -164,7 +169,10 @@ fun DetailScreen(
             }
             is UiState.Success -> {
                 val data = (uiState as UiState.Success<ProductResponseItem>).data
-                selectedPrice =data.price as Double
+
+                LaunchedEffect(Unit) {
+                    opPrice = data.price as Double
+                }
                 DetailContent(
                     product = data,
                     paddingValues = innerPading,
@@ -196,7 +204,7 @@ fun DetailScreen(
     // Show dialog for vendor comparison
     if (showDialog) {
         CompareVendorsDialog(
-            originalPrice = selectedPrice,
+            originalPrice = opPrice,
             onDismiss = { showDialog = false },
             onVendorSelected = { price ->
                 selectedPrice = price
@@ -357,7 +365,8 @@ fun DetailContent(
                     fontFamily = poppinsFontFamily,
                     fontWeight = FontWeight.SemiBold,
                     fontSize = 40.sp,
-                    text = "Rs. ${String.format("%.1f", selectedPrice ?: product.price)}"
+                    text = "Rs. ${String.format("%.1f", if (((selectedPrice ?: product.price) as Double) in 1.0..9.9) product.price else selectedPrice ?: product.price)}"
+
                 )
                 Button(
                     modifier = Modifier
@@ -454,22 +463,51 @@ fun CompareVendorsDialog(
     onVendorSelected: (Double) -> Unit
 ) {
     val vendors = remember { generateRandomVendors(originalPrice) }
+    val rowColors = listOf(Color(0xFFF5F5F5), Color(0xFFFFFFFF)) // Light gray and white
 
-    androidx.compose.material3.AlertDialog(
+    AlertDialog(
         onDismissRequest = onDismiss,
-        title = { Text("Compare Vendors") },
+        title = {
+            Text(
+                text = "Compare Vendors",
+                style = MaterialTheme.typography.titleLarge
+            )
+        },
         text = {
             Column {
-                vendors.forEach { vendor ->
-                    Row(modifier = Modifier.clickable {
-                        onVendorSelected(vendor.price)
-                        onDismiss()
-                    }) {
-                        Text(text = "${vendor.name}: Rs. ${vendor.price}")
-                        Spacer(modifier = Modifier.width(8.dp))
-                        Text(text = "Rating: ${vendor.rating}")
+                // Header Row
+                Row(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(vertical = 8.dp),
+                    horizontalArrangement = Arrangement.SpaceBetween
+                ) {
+                    Text(text = "Vendor", fontWeight = FontWeight.Bold)
+                    Text(text = "Price", fontWeight = FontWeight.Bold)
+                    Text(text = "Rating", fontWeight = FontWeight.Bold)
+                }
+
+                Divider()
+
+                // Vendor Rows
+                vendors.forEachIndexed { index, vendor ->
+                    val bgColor = rowColors[index % rowColors.size]
+
+                    Row(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .background(bgColor)
+                            .clickable {
+                                onVendorSelected(vendor.price)
+                                onDismiss()
+                            }
+                            .padding(vertical = 12.dp, horizontal = 8.dp),
+                        horizontalArrangement = Arrangement.SpaceBetween
+                    ) {
+                        Text(text = vendor.name)
+                        Text(text = "₹${String.format("%.2f", vendor.price)}")
+                        Text(text = "⭐ ${vendor.rating}")
                     }
-                    Spacer(modifier = Modifier.height(8.dp))
                 }
             }
         },
@@ -480,6 +518,7 @@ fun CompareVendorsDialog(
         }
     )
 }
+
 
 
 fun generateRandomVendors(originalPrice: Double): List<Vendor> {
